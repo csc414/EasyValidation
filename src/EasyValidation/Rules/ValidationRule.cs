@@ -12,9 +12,9 @@ namespace EasyValidation.Rules
 
         private static Regex _regex = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-        protected abstract string DefaultErrorMessage { get; }
+        public string ErrorMessage { get; set; }
 
-        public string ErrorMessage { get; set; }  
+        protected abstract string DefaultErrorMessage { get; }
 
         public abstract bool IsValid(PropertyValidationContext context);
 
@@ -38,7 +38,7 @@ namespace EasyValidation.Rules
             {
                 var name = match.Result("$1");
                 if (arguments.TryGetValue(name, out object value))
-                    return value.ToString();
+                    return value?.ToString();
                 return match.Value;
             });
         }
