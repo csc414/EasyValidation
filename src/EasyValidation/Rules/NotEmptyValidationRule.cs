@@ -19,7 +19,7 @@ namespace EasyValidation.Rules
 
         public override bool IsValid(PropertyValidationContext context)
         {
-            switch (context.Value)
+            switch (context.PropertyValue)
             {
                 case null:
                 case string s when string.IsNullOrWhiteSpace(s):
@@ -28,7 +28,7 @@ namespace EasyValidation.Rules
                 case IEnumerable e when !e.Cast<object>().Any():
                     return false;
             }
-            return !Equals(context.Value, _defaultValue);
+            return !Equals(context.PropertyValue, _defaultValue);
         }
     }
 }

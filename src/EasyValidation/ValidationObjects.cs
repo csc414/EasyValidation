@@ -8,11 +8,11 @@ using System.Text;
 
 namespace EasyValidation
 {
-    public static class ValidationObjects
+    internal static class ValidationObjects
     {
         static readonly Dictionary<Type, IEnumerable<PropertyValidator>> _validators = new Dictionary<Type, IEnumerable<PropertyValidator>>();
 
-        internal static bool AddObject(Type instanceType, IEnumerable<PropertyValidator> validators)
+        public static bool AddObject(Type instanceType, IEnumerable<PropertyValidator> validators)
         {
             if (_validators.ContainsKey(instanceType))
                 return false;
@@ -29,45 +29,22 @@ namespace EasyValidation
         }
     }
 
-    public static class ValidationObjects<TEntity>
+    public static class ValidationObjects<T>
     {
         static readonly Dictionary<PropertyInfo, PropertyValidator> _validators = new Dictionary<PropertyInfo, PropertyValidator>();
 
-        static ValidationObjects() => ValidationObjects.AddObject(typeof(TEntity), _validators.Values);
+        static ValidationObjects() => ValidationObjects.AddObject(typeof(T), _validators.Values);
 
-        public static PropertyValidatorBuilder Property<TProperty>(Expression<Func<TEntity, TProperty>> expression)
-        {
-            return Property(GetPropertyInfo(expression));
-        }
-        
-        public static PropertyValidatorBuilder Property(string name)
-        {
-            return Property(typeof(TEntity).GetRuntimeProperty(name));
-        }
+        public static IEnumerable<PropertyValidator> Validators => _validators.Values;
 
-        static PropertyValidatorBuilder Property(PropertyInfo propertyInfo)
+        public static PropertyValidatorBuilder<T, TProperty> Property<TProperty>(Expression<Func<T, TProperty>> expression)
         {
-            Check.IfNullThrow(propertyInfo, message: "Property not found.");
+            var propertyInfo = Helper.GetPropertyInfo(expression);
 
             if (!_validators.TryGetValue(propertyInfo, out var validator))
                 _validators.Add(propertyInfo, validator = new PropertyValidator(propertyInfo));
 
-            return new PropertyValidatorBuilder(validator);
-        }
-
-        static PropertyInfo GetPropertyInfo(LambdaExpression expression)
-        {
-            MemberExpression memberExpression = null;
-
-            if (expression.Body is UnaryExpression unaryExp)
-                memberExpression = (MemberExpression)unaryExp.Operand;
-            else if (expression.Body is MemberExpression memberExp)
-                memberExpression = memberExp;
-
-            if (memberExpression == null || memberExpression.Member.MemberType != MemberTypes.Property)
-                return null;
-
-            return (PropertyInfo)memberExpression.Member;
+            return new PropertyValidatorBuilder<T, TProperty>(validator);
         }
     }
 }

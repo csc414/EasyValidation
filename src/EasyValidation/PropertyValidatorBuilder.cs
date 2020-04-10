@@ -1,12 +1,14 @@
 ﻿
 using EasyValidation.Rules;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace EasyValidation
 {
-    public class PropertyValidatorBuilder
+    public class PropertyValidatorBuilder<T, TProperty>
     {
         public PropertyValidatorBuilder(PropertyValidator validator)
         {
@@ -15,31 +17,50 @@ namespace EasyValidation
 
         public PropertyValidator Validator { get; }
 
-        public PropertyValidatorBuilder DisplayName(string name)
+        public PropertyValidatorBuilder<T, TProperty> DisplayName(string name)
         {
-            Validator.DisplayName = name;
+            Validator.Descriptor.DisplayName = name;
             return this;
         }
 
-        public PropertyValidatorBuilder NotNull(string message = null)
+        public PropertyValidatorBuilder<T, TProperty> NotNull(string message = null)
         {
             Validator.Rules.Add(new NotNullValidationRule { ErrorMessage = message });
             return this;
         }
 
-        public PropertyValidatorBuilder NotEmpty(string message = null)
+        public PropertyValidatorBuilder<T, TProperty> NotEmpty(string message = null)
         {
-            var defaultValue = GetDefaultValue(Validator.PropertyInfo.PropertyType);
-            Validator.Rules.Add(new NotEmptyValidationRule (defaultValue) { ErrorMessage = message });
+            Validator.Rules.Add(new NotEmptyValidationRule (default(TProperty)) { ErrorMessage = message });
             return this;
         }
 
-        private object GetDefaultValue(Type type)
+        public PropertyValidatorBuilder<T, TProperty> Mutiple(Action<PropertyValidatorBuilder<T, TProperty>> builder, string message = null)
         {
-            if (type.IsValueType)
-                return Activator.CreateInstance(type);
+            var validator = new PropertyValidator(Validator.Descriptor);
+            builder?.Invoke(new PropertyValidatorBuilder<T, TProperty>(validator));
+            if (validator.Rules.Count > 0)
+                Validator.Rules.Add(new MultipleValidationRule(validator) { ErrorMessage = message });
 
-            return null;
+            return this;
+        }
+
+        public PropertyValidatorBuilder<T, TProperty> Equal(TProperty value, IEqualityComparer comparer = null, string message = null)
+        {
+            if (comparer == null && typeof(TProperty) == typeof(string))
+                comparer = StringComparer.Ordinal;
+
+            Validator.Rules.Add(new EqualValidationRule(value, comparer) { ErrorMessage = message });
+            return this;
+        }
+
+        public PropertyValidatorBuilder<T, TProperty> Equal(Expression<Func<T, TProperty>> expression, IEqualityComparer comparer = null, string message = null)
+        {
+            if (comparer == null && typeof(TProperty) == typeof(string))
+                comparer = StringComparer.Ordinal;
+
+            Validator.Rules.Add(new EqualValidationRule(expression.Compile(), comparer) { ErrorMessage = message });
+            return this;
         }
     }
 }

@@ -12,9 +12,9 @@ namespace EasyValidation.Tests
         [Fact]
         public void Test2()
         {
-            ValidationObjects<Student>.Property(o=> o.Name).NotEmpty();
-            ValidationObjects<Student>.Property(o => o.Names).NotEmpty();
-            var student = new Student { Name = "", Age = 17, MyAge = 18 };
+            ValidationObjects<Student>.Property(o => o.Name).Equal(o=> o.NickName).DisplayName("Ãû³Æ");
+            //ValidationObjects<Student>.Property(o => o.Names).NotEmpty();
+            var student = new Student { Name = "ABC", NickName = "ABC1", Age = 17, MyAge = 18 };
             ValidationResult result = Validator.Validate(student);
             if (result.IsValid)
             {
@@ -29,6 +29,8 @@ namespace EasyValidation.Tests
         class Student
         {
             public string Name { get; set; }
+
+            public string NickName { get; set; }
 
             public int Age { get; set; }
 

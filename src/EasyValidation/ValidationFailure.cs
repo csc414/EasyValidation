@@ -15,7 +15,7 @@ namespace EasyValidation
 
 		public string ErrorMessage { get; set; }
 
-		public IDictionary<string, object> FormattedArguments { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+		public IDictionary<string, object> FormattedArguments { get; set; }
 
 		public override string ToString()
 		{

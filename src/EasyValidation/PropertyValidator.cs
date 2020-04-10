@@ -11,12 +11,15 @@ namespace EasyValidation
     {
         public PropertyValidator(PropertyInfo propertyInfo)
         {
-            PropertyInfo = propertyInfo;
+            Descriptor = new PropertyDescriptor(propertyInfo);
         }
 
-        public PropertyInfo PropertyInfo { get; }
+        public PropertyValidator(PropertyDescriptor descriptor)
+        {
+            Descriptor = descriptor;
+        }
 
-        public string DisplayName { get; set; }
+        public PropertyDescriptor Descriptor { get; }
 
         public IList<ValidationRule> Rules { get; } = new List<ValidationRule>();
 

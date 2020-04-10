@@ -10,7 +10,7 @@ namespace EasyValidation.Rules
 
         public override bool IsValid(PropertyValidationContext context)
         {
-            if (context.Value == null)
+            if (context.PropertyValue == null)
                 return false;
             return true;
         }
