@@ -21,7 +21,7 @@ namespace EasyValidation.Rules
 
             var failure = new ValidationFailure(context.PropertyInfo.Name);
             failure.FormattedArguments = context.FormattedArguments;
-            failure.ErrorMessage = context.BuildErrorMessage(ErrorMessage ?? DefaultErrorMessage);
+            failure.ErrorMessage = context.BuildErrorMessage(ErrorMessage ?? context.Descriptor.ErrorMessage ?? DefaultErrorMessage);
             return failure;
         }
     }

@@ -26,7 +26,7 @@ namespace EasyValidation.Rules
 
         public object ComparisonValue { get; }
 
-        protected override string DefaultErrorMessage => "'{PropertyName}' 不能和 '{ComparisonValue}' 相等。";
+        protected override string DefaultErrorMessage => "{PropertyName} 不能和 {ComparisonValue} 相等。";
 
         public override bool IsValid(PropertyValidationContext context)
         {

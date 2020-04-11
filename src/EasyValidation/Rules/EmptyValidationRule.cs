@@ -6,16 +6,16 @@ using System.Text;
 
 namespace EasyValidation.Rules
 {
-    public class NotEmptyValidationRule : ValidationRule
+    public class EmptyValidationRule : ValidationRule
     {
         private readonly object _defaultValue;
 
-        public NotEmptyValidationRule(object defaultValue)
+        public EmptyValidationRule(object defaultValue)
         {
             _defaultValue = defaultValue;
         }
 
-        protected override string DefaultErrorMessage => "'{PropertyName}' 不能为空。";
+        protected override string DefaultErrorMessage => "{PropertyName} 必须为空。";
 
         public override bool IsValid(PropertyValidationContext context)
         {
@@ -26,9 +26,9 @@ namespace EasyValidation.Rules
                 case ICollection c when c.Count == 0:
                 case Array a when a.Length == 0:
                 case IEnumerable e when !e.Cast<object>().Any():
-                    return false;
+                    return true;
             }
-            return !Equals(context.PropertyValue, _defaultValue);
+            return Equals(context.PropertyValue, _defaultValue);
         }
     }
 }

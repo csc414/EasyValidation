@@ -12,30 +12,31 @@ namespace EasyValidation
 
         private static Regex _regex = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-        private readonly PropertyValidator _propertyValidator;
-
         private object _value;
 
         public PropertyValidationContext(ValidationContext context, PropertyValidator propertyValidator)
         {
+            
             Context = context;
-            _propertyValidator = propertyValidator;
+            Descriptor = propertyValidator.Descriptor;
             FormattedArguments = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { nameof(PropertyName), propertyValidator.Descriptor.DisplayName ?? propertyValidator.Descriptor.PropertyInfo.Name } };
         }
 
         public ValidationContext Context { get; }
 
+        public PropertyDescriptor Descriptor { get; }
+
         public object Instance => Context.Instance;
 
         public Type InstanceType => Context.InstanceType;
 
-        public PropertyInfo PropertyInfo => _propertyValidator.Descriptor.PropertyInfo;
+        public PropertyInfo PropertyInfo => Descriptor.PropertyInfo;
 
         public string PropertyName => PropertyInfo.Name;
 
         public object PropertyValue => _value ?? (_value = PropertyInfo.GetValue(Context.Instance));
 
-        public string DisplayName => _propertyValidator.Descriptor.DisplayName;
+        public string DisplayName => Descriptor.DisplayName;
 
         public IDictionary<string, object> FormattedArguments { get; }
 

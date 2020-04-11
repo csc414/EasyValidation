@@ -15,5 +15,7 @@ namespace EasyValidation
         public PropertyInfo PropertyInfo { get; }
 
         public string DisplayName { get; set; }
+
+        public string ErrorMessage { get; set; }
     }
 }
