@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -47,6 +48,8 @@ namespace EasyValidation
                 var name = match.Result("$1");
                 if (FormattedArguments.TryGetValue(name, out object value))
                     return value?.ToString();
+                if (int.TryParse(name, out int i) && i < FormattedArguments.Values.Count)
+                    return FormattedArguments.Values.ElementAt(i)?.ToString();
                 return match.Value;
             });
         }

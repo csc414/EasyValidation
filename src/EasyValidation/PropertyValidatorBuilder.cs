@@ -3,7 +3,9 @@ using EasyValidation.Rules;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -123,6 +125,19 @@ namespace EasyValidation
         public PropertyValidatorBuilder<T, TProperty> Match(string pattern, RegexOptions options = RegexOptions.None, string message = null)
         {
             Validator.Rules.Add(new RegularExpressionValidationRule(pattern, options) { ErrorMessage = message });
+            return this;
+        }
+
+        public PropertyValidatorBuilder<T, TProperty> DataAnnotation(string message = null)
+        {
+            var attributes = Validator.Descriptor.PropertyInfo.GetCustomAttributes<ValidationAttribute>(true);
+            Validator.Rules.Add(new DataAnnotationRule(attributes) { ErrorMessage = message });
+            return this;
+        }
+
+        public PropertyValidatorBuilder<T, TProperty> DataAnnotation(ValidationAttribute attribute, string message = null)
+        {
+            Validator.Rules.Add(new DataAnnotationRule(attribute) { ErrorMessage = message });
             return this;
         }
 

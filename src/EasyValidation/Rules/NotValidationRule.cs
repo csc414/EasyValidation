@@ -8,14 +8,11 @@ namespace EasyValidation.Rules
 {
     public class NotValidationRule : ValidationRule
     {
+        public NotValidationRule(ValidationRule rule) : this(new[] { rule }) { }
+
         public NotValidationRule(IEnumerable<ValidationRule> rules)
         {
             Rules = rules;
-        }
-
-        public NotValidationRule(ValidationRule rule)
-        {
-            Rules = new[] { rule };
         }
 
         public IEnumerable<ValidationRule> Rules { get; }
