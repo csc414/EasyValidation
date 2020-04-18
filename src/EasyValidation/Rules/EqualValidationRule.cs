@@ -10,21 +10,21 @@ namespace EasyValidation.Rules
     {
         private readonly Delegate _delegate;
 
+        private readonly IEqualityComparer _comparer;
+
+        private readonly object _comparisonValue;
+
         public EqualValidationRule(object comparisonValue, IEqualityComparer comparer = null)
         {
-            ComparisonValue = comparisonValue;
-            Comparer = comparer;
+            _comparisonValue = comparisonValue;
+            _comparer = comparer;
         }
 
         public EqualValidationRule(Delegate @delegate, IEqualityComparer comparer = null)
         {
             _delegate = @delegate;
-            Comparer = comparer;
+            _comparer = comparer;
         }
-
-        public IEqualityComparer Comparer { get; }
-
-        public object ComparisonValue { get; }
 
         protected override string DefaultErrorMessage => "{PropertyName} 不能和 {ComparisonValue} 相等。";
 
@@ -41,8 +41,8 @@ namespace EasyValidation.Rules
 
         private bool Compare(object propertyValue, object value)
         {
-            if (Comparer != null)
-                return Comparer.Equals(value, propertyValue);
+            if (_comparer != null)
+                return _comparer.Equals(value, propertyValue);
 
             return Equals(value, propertyValue);
         }
@@ -52,7 +52,7 @@ namespace EasyValidation.Rules
             if (_delegate != null)
                 return _delegate.DynamicInvoke(context.Instance);
 
-            return ComparisonValue;
+            return _comparisonValue;
         }
     }
 }

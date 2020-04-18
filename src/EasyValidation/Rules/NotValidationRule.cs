@@ -8,20 +8,20 @@ namespace EasyValidation.Rules
 {
     public class NotValidationRule : ValidationRule
     {
+        private readonly IEnumerable<ValidationRule> _rules;
+
         public NotValidationRule(ValidationRule rule) : this(new[] { rule }) { }
 
         public NotValidationRule(IEnumerable<ValidationRule> rules)
         {
-            Rules = rules;
+            _rules = rules;
         }
-
-        public IEnumerable<ValidationRule> Rules { get; }
 
         protected override string DefaultErrorMessage => "{PropertyName} 未符合指定的条件。";
 
         public override bool IsValid(PropertyValidationContext context)
         {
-            foreach (var rule in Rules)
+            foreach (var rule in _rules)
             {
                 if (rule.IsValid(context))
                     return false;

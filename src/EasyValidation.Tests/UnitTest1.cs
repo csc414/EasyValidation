@@ -13,13 +13,16 @@ namespace EasyValidation.Tests
         public void Test2()
         {
             Validator.Model<Student>(builder => {
-                builder.Property(o => o.Name).DataAnnotation().DisplayName("名称").WithMessage("请输入正确的名称");
-                builder.Property(o => o.NickName).Not(o => o.Empty()).Match(@"\d+");
-                builder.Property(o => o.Age).DisplayName("年龄").Must(age =>  age >= 18, "{propertyName} 必须大于18岁");
+                builder.Property(o => o.Name).DataAnnotation().DisplayName("名称").Length(3, 5);
+                builder.Property(o => o.NickName).NotEmpty().Match(@"\d+");
+                builder.Property(o => o.Age).DisplayName("年龄").NotNull().Range(5,10);
             });
             
-            var student = new Student { Age = 18 };
-            ValidationResult result = Validator.Validate(student);
+            var student = new Student { Name="he", Age = 17 };
+
+            ValidationResult result = Validator.Validate(student, builder => {
+                builder.Include(o => o.Name);
+            });
             if (result.IsValid)
             {
                 
@@ -38,12 +41,11 @@ namespace EasyValidation.Tests
         class Student
         {
             [Required(ErrorMessage = "{0}不能为空")]
-            [EmailAddress]
             public string Name { get; set; }
 
             public string NickName { get; set; }
 
-            public int Age { get; set; }
+            public int? Age { get; set; }
 
             public IList<string> Names { get; set; } = new List<string>();
         }

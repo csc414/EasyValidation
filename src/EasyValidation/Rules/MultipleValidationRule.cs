@@ -6,20 +6,20 @@ namespace EasyValidation.Rules
 {
     public class MultipleValidationRule : ValidationRule
     {
+        private readonly PropertyValidator _validator;
+
         private string _errorMessage;
 
         public MultipleValidationRule(PropertyValidator validator)
         {
-            Validator = validator;
+            _validator = validator;
         }
-
-        public PropertyValidator Validator { get; }
 
         protected override string DefaultErrorMessage => _errorMessage;
 
         public override bool IsValid(PropertyValidationContext context)
         {
-            var failure = Validator.Validate(context.Context);
+            var failure = _validator.Validate(context.Context);
             if (failure == null)
                 return true;
 

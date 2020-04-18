@@ -18,13 +18,35 @@ namespace EasyValidation
             buildAction?.Invoke(new ModelConfigurationBuilder<T>(configuration));
         }
 
-        public static ValidationResult Validate(object instance) => Validate(new ValidationContext(instance));
+        public static ValidationResult Validate<T>(T instance) => Validate(new ValidationContext(instance), strategy: null);
 
-        public static ValidationResult Validate(ValidationContext context)
+        public static ValidationResult Validate<T>(T instance, Action<StrategyBuilder<T>> buildAction)
+        {
+            var builder = new StrategyBuilder<T>();
+            buildAction?.Invoke(builder);
+            var strategy = builder.Build();
+            return Validate(new ValidationContext(instance), strategy);
+        }
+
+        public static ValidationResult Validate<T>(T instance, Strategy strategy) => Validate(new ValidationContext(instance), strategy);
+
+        public static ValidationResult Validate(ValidationContext context, Strategy strategy)
         {
             var result = new ValidationResult();
             var configuration = ValidationModels.Configuration(context.InstanceType);
-            var failures = configuration.Validators.Select(o => o.Validate(context)).Where(o => o != null);
+            var validators = configuration.Validators;
+            if (strategy != null)
+            {
+                if (strategy.IncludeProperties.Any() && strategy.ExcludeProperties.Any())
+                    throw new ArgumentException("Include or Exclude, you can only choose one.");
+
+                if (strategy.IncludeProperties.Any())
+                    validators = validators.Where(o => strategy.IncludeProperties.Contains(o.Descriptor.PropertyInfo));
+                else if(strategy.ExcludeProperties.Any())
+                    validators = validators.Where(o => !strategy.ExcludeProperties.Contains(o.Descriptor.PropertyInfo));
+            }
+
+            var failures = validators.Select(o => o.Validate(context)).Where(o => o != null);
             return result.AddErrors(failures);
         }
     }
