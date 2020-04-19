@@ -9,20 +9,28 @@ namespace EasyValidation.Tests
 {
     public class UnitTest1
     {
+        public enum VerifyType 
+        {
+            Login,
+            FindPassword
+        }
+
+
         [Fact]
         public void Test2()
         {
             Validator.Model<Student>(builder => {
-                builder.Property(o => o.Name).DataAnnotation().DisplayName("Ãû³Æ").Length(3, 5);
+                builder.Property(o => o.Name).DisplayName("Ãû³Æ").DataAnnotation().Length(3, 5);
                 builder.Property(o => o.NickName).When(o => o.Age >= 18, o => o.NotEmpty());
+            });
+
+            Validator.Model<Student>(VerifyType.FindPassword, builder => {
                 builder.Property(o => o.Age).DisplayName("ÄêÁä").Range(5,10);
             });
             
             var student = new Student { Name="he", Age = 18 };
 
-            ValidationResult result = Validator.Validate(student, builder => {
-                //builder.Include(o => o.Name);
-            });
+            ValidationResult result = Validator.Validate(student);
             if (result.IsValid)
             {
                 
