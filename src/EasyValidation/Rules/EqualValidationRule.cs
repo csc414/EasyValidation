@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace EasyValidation.Rules
 {
@@ -31,7 +28,7 @@ namespace EasyValidation.Rules
         public override bool IsValid(PropertyValidationContext context)
         {
             var value = GetComparisonValue(context);
-            if(!Compare(context.PropertyValue, value))
+            if (!Compare(context.PropertyValue, value))
             {
                 context.FormattedArguments.Add("ComparisonValue", value);
                 return false;

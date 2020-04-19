@@ -1,11 +1,9 @@
 ﻿using EasyValidation.Rules;
 using System;
-using System.Reflection;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using System.Text;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace EasyValidation
@@ -24,7 +22,13 @@ namespace EasyValidation
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> Null<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, string message = null)
+        public static PropertyValidatorBuilder<T, TProperty> Null<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, string message = null) where TProperty : class
+        {
+            builder.Validator.Rules.Add(new NullValidationRule { ErrorMessage = message });
+            return builder;
+        }
+
+        public static PropertyValidatorBuilder<T, TProperty?> Null<T, TProperty>(this PropertyValidatorBuilder<T, TProperty?> builder, string message = null) where TProperty : struct
         {
             builder.Validator.Rules.Add(new NullValidationRule { ErrorMessage = message });
             return builder;
@@ -46,7 +50,13 @@ namespace EasyValidation
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> NotNull<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, string message = "{PropertyName} 不能为Null。")
+        public static PropertyValidatorBuilder<T, TProperty> NotNull<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, string message = "{PropertyName} 不能为Null。") where TProperty : class
+        {
+            builder.Validator.Rules.Add(new NotValidationRule(new NullValidationRule()) { ErrorMessage = message });
+            return builder;
+        }
+
+        public static PropertyValidatorBuilder<T, TProperty?> NotNull<T, TProperty>(this PropertyValidatorBuilder<T, TProperty?> builder, string message = "{PropertyName} 不能为Null。") where TProperty : struct
         {
             builder.Validator.Rules.Add(new NotValidationRule(new NullValidationRule()) { ErrorMessage = message });
             return builder;
@@ -65,6 +75,32 @@ namespace EasyValidation
             if (childbuilder.Validator.Rules.Count > 0)
                 builder.Validator.Rules.Add(new MultipleValidationRule(childbuilder.Validator) { ErrorMessage = message });
 
+            return builder;
+        }
+
+        public static PropertyValidatorBuilder<T, TProperty> When<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, Func<T, bool> predicate, Action<PropertyValidatorBuilder<T, TProperty>> buildAction)
+        {
+            Check.IfNullThrow(predicate, "Cannot pass a null predicate to When.");
+
+            var childbuilder = builder.CreateChildBuilder();
+            buildAction?.Invoke(childbuilder);
+            if (childbuilder.Validator.Rules.Count > 0)
+            {
+                var validator = childbuilder.Validator;
+                builder.Validator.Rules.Add(new PredicateValidationRule((instance, propertyValue, rule, context) =>
+                {
+                    if (predicate((T)instance))
+                    {
+                        var failure = validator.Validate(context.Context);
+                        if (failure != null)
+                        {
+                            rule.ErrorMessage = failure.ErrorMessage;
+                            return false;
+                        }
+                    }
+                    return true;
+                }));
+            }
             return builder;
         }
 
@@ -104,17 +140,17 @@ namespace EasyValidation
         {
             Check.IfNullThrow(predicate, "Cannot pass a null predicate to Must.");
 
-            builder.Validator.Rules.Add(new PredicateValidationRule((instance, propertyValue, context) => predicate((T)instance, (TProperty)propertyValue, context)) { ErrorMessage = message });
+            builder.Validator.Rules.Add(new PredicateValidationRule((instance, propertyValue, rule, context) => predicate((T)instance, (TProperty)propertyValue, context)) { ErrorMessage = message });
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> Match<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, Func<T, string> expression, RegexOptions options = RegexOptions.None, string message = null)
+        public static PropertyValidatorBuilder<T, string> Match<T>(this PropertyValidatorBuilder<T, string> builder, Func<T, string> expression, RegexOptions options = RegexOptions.None, string message = null)
         {
             builder.Validator.Rules.Add(new RegularExpressionValidationRule(o => expression((T)o), options) { ErrorMessage = message });
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> Match<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, string pattern, RegexOptions options = RegexOptions.None, string message = null)
+        public static PropertyValidatorBuilder<T, string> Match<T>(this PropertyValidatorBuilder<T, string> builder, string pattern, RegexOptions options = RegexOptions.None, string message = null)
         {
             builder.Validator.Rules.Add(new RegularExpressionValidationRule(pattern, options) { ErrorMessage = message });
             return builder;
@@ -132,27 +168,28 @@ namespace EasyValidation
             builder.Validator.Rules.Add(new DataAnnotationRule(attribute) { ErrorMessage = message });
             return builder;
         }
-        public static PropertyValidatorBuilder<T, TProperty> Email<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, string message = null)
+
+        public static PropertyValidatorBuilder<T, string> Email<T>(this PropertyValidatorBuilder<T, string> builder, string message = null)
         {
             builder.Validator.Rules.Add(new EmailValidationRule() { ErrorMessage = message });
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> Length<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, int min, int max, string message = null)
+        public static PropertyValidatorBuilder<T, string> Length<T>(this PropertyValidatorBuilder<T, string> builder, int min, int max, string message = null)
         {
             builder.Validator.Rules.Add(new LengthValidationRule(min, max) { ErrorMessage = message });
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> MinimumLength<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, int min, string message = null)
+        public static PropertyValidatorBuilder<T, string> MinimumLength<T>(this PropertyValidatorBuilder<T, string> builder, int minimumLength, string message = null)
         {
-            builder.Validator.Rules.Add(new MinimumLengthValidationRule(min) { ErrorMessage = message });
+            builder.Validator.Rules.Add(new MinimumLengthValidationRule(minimumLength) { ErrorMessage = message });
             return builder;
         }
 
-        public static PropertyValidatorBuilder<T, TProperty> MaximumLength<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, int max, string message = null)
+        public static PropertyValidatorBuilder<T, string> MaximumLength<T>(this PropertyValidatorBuilder<T, string> builder, int maximumLength, string message = null)
         {
-            builder.Validator.Rules.Add(new MaximumLengthValidationRule(max) { ErrorMessage = message });
+            builder.Validator.Rules.Add(new MaximumLengthValidationRule(maximumLength) { ErrorMessage = message });
             return builder;
         }
 
@@ -161,7 +198,6 @@ namespace EasyValidation
             var validator = new PropertyValidator(builder.Validator.Descriptor);
             return new PropertyValidatorBuilder<T, TProperty>(validator);
         }
-
 
         public static PropertyValidatorBuilder<T, TProperty> Range<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, TProperty from, TProperty to, string message = null) where TProperty : IComparable<TProperty>, IComparable
         {

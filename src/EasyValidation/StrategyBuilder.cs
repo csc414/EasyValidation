@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
 namespace EasyValidation
 {
     public class StrategyBuilder<T>
     {
-        private readonly ICollection<PropertyInfo> _includeProperties = new HashSet<PropertyInfo>();
+        public StrategyBuilder()
+        {
+            Strategy = new Strategy();
+        }
 
-        private readonly ICollection<PropertyInfo> _excludeProperties = new HashSet<PropertyInfo>();
+        public Strategy Strategy { get; }
 
         public StrategyBuilder<T> Include<TProperty>(params Expression<Func<T, TProperty>>[] expressions)
         {
@@ -19,9 +19,9 @@ namespace EasyValidation
                 var propertyInfo = Helper.GetPropertyInfo(expression);
                 Check.IfNullThrow(propertyInfo);
 
-                _includeProperties.Add(propertyInfo);
+                Strategy.IncludeProperties.Add(propertyInfo);
             }
-          
+
             return this;
         }
 
@@ -32,15 +32,10 @@ namespace EasyValidation
                 var propertyInfo = Helper.GetPropertyInfo(expression);
                 Check.IfNullThrow(propertyInfo);
 
-                _includeProperties.Add(propertyInfo);
+                Strategy.ExcludeProperties.Add(propertyInfo);
             }
 
             return this;
-        }
-
-        public Strategy Build()
-        {
-            return new Strategy { IncludeProperties = _includeProperties, ExcludeProperties = _excludeProperties };
         }
     }
 }

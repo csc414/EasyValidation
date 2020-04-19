@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace EasyValidation
 {
@@ -24,8 +23,7 @@ namespace EasyValidation
         {
             var builder = new StrategyBuilder<T>();
             buildAction?.Invoke(builder);
-            var strategy = builder.Build();
-            return Validate(new ValidationContext(instance), strategy);
+            return Validate(new ValidationContext(instance), builder.Strategy);
         }
 
         public static ValidationResult Validate<T>(T instance, Strategy strategy) => Validate(new ValidationContext(instance), strategy);
@@ -42,7 +40,7 @@ namespace EasyValidation
 
                 if (strategy.IncludeProperties.Any())
                     validators = validators.Where(o => strategy.IncludeProperties.Contains(o.Descriptor.PropertyInfo));
-                else if(strategy.ExcludeProperties.Any())
+                else if (strategy.ExcludeProperties.Any())
                     validators = validators.Where(o => !strategy.ExcludeProperties.Contains(o.Descriptor.PropertyInfo));
             }
 

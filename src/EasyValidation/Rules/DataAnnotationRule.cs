@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace EasyValidation.Rules
 {
@@ -11,7 +9,9 @@ namespace EasyValidation.Rules
 
         private string _errorMessage;
 
-        public DataAnnotationRule(ValidationAttribute attribute) : this(new[] { attribute }) { }
+        public DataAnnotationRule(ValidationAttribute attribute) : this(new[] { attribute })
+        {
+        }
 
         public DataAnnotationRule(IEnumerable<ValidationAttribute> attributes)
         {
@@ -28,7 +28,7 @@ namespace EasyValidation.Rules
             foreach (var attribute in _attributes)
             {
                 var result = attribute.GetValidationResult(context.PropertyValue, validationContext);
-                if(result != null)
+                if (result != null)
                 {
                     _errorMessage = result.ErrorMessage;
                     return false;

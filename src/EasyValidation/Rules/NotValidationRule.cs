@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace EasyValidation.Rules
 {
@@ -10,7 +6,9 @@ namespace EasyValidation.Rules
     {
         private readonly IEnumerable<ValidationRule> _rules;
 
-        public NotValidationRule(ValidationRule rule) : this(new[] { rule }) { }
+        public NotValidationRule(ValidationRule rule) : this(new[] { rule })
+        {
+        }
 
         public NotValidationRule(IEnumerable<ValidationRule> rules)
         {

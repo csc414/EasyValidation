@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EasyValidation
@@ -17,7 +16,6 @@ namespace EasyValidation
 
         public PropertyValidationContext(ValidationContext context, PropertyValidator propertyValidator)
         {
-            
             Context = context;
             Descriptor = propertyValidator.Descriptor;
             FormattedArguments = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { nameof(PropertyName), propertyValidator.Descriptor.DisplayName ?? propertyValidator.Descriptor.PropertyInfo.Name } };

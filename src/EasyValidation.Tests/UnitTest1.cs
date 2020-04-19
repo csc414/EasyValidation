@@ -14,14 +14,14 @@ namespace EasyValidation.Tests
         {
             Validator.Model<Student>(builder => {
                 builder.Property(o => o.Name).DataAnnotation().DisplayName("名称").Length(3, 5);
-                builder.Property(o => o.NickName).NotEmpty().Match(@"\d+");
-                builder.Property(o => o.Age).DisplayName("年龄").NotNull().Range(5,10);
+                builder.Property(o => o.NickName).When(o => o.Age >= 18, o => o.NotEmpty());
+                builder.Property(o => o.Age).DisplayName("年龄").Range(5,10);
             });
             
-            var student = new Student { Name="he", Age = 17 };
+            var student = new Student { Name="he", Age = 18 };
 
             ValidationResult result = Validator.Validate(student, builder => {
-                builder.Include(o => o.Name);
+                //builder.Include(o => o.Name);
             });
             if (result.IsValid)
             {
@@ -33,11 +33,6 @@ namespace EasyValidation.Tests
             }
         }
 
-        class MyStudent : Student
-        {
-
-        }
-
         class Student
         {
             [Required(ErrorMessage = "{0}不能为空")]
@@ -45,7 +40,7 @@ namespace EasyValidation.Tests
 
             public string NickName { get; set; }
 
-            public int? Age { get; set; }
+            public int Age { get; set; }
 
             public IList<string> Names { get; set; } = new List<string>();
         }

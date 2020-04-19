@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace EasyValidation.Rules
+﻿namespace EasyValidation.Rules
 {
     public abstract class ValidationRule
     {

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace EasyValidation.Rules
@@ -9,7 +7,9 @@ namespace EasyValidation.Rules
     {
         private Func<object, Regex> _func;
 
-        public RegularExpressionValidationRule(string pattern, RegexOptions options) : this(o => pattern, options) { }
+        public RegularExpressionValidationRule(string pattern, RegexOptions options) : this(o => pattern, options)
+        {
+        }
 
         public RegularExpressionValidationRule(Func<object, string> func, RegexOptions options)
         {
@@ -24,7 +24,7 @@ namespace EasyValidation.Rules
                 return true;
 
             var regex = _func(context.Instance);
-            return regex.IsMatch((string) context.PropertyValue);
+            return regex.IsMatch((string)context.PropertyValue);
         }
 
         private static Regex CreateRegex(string expression, RegexOptions options = RegexOptions.None)

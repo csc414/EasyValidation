@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace EasyValidation.Rules
+﻿namespace EasyValidation.Rules
 {
     public class PredicateValidationRule : ValidationRule
     {
-        public delegate bool Predicate(object instance, object propertyValue, PropertyValidationContext propertyValidatorContext);
+        public delegate bool Predicate(object instance, object propertyValue, ValidationRule rule, PropertyValidationContext propertyValidatorContext);
 
         private readonly Predicate _predicate;
 
@@ -21,7 +17,7 @@ namespace EasyValidation.Rules
 
         public override bool IsValid(PropertyValidationContext context)
         {
-            if (!_predicate(context.Instance, context.PropertyValue, context))
+            if (!_predicate(context.Instance, context.PropertyValue, this, context))
                 return false;
 
             return true;
