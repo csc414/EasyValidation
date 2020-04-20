@@ -8,25 +8,25 @@ namespace EasyValidation
     {
         public static ModelConfigurationBuilder<T> Model<T>()
         {
-            var configuration = ValidationModels.Configuration<T>();
+            var configuration = ValidationModels.GetOrCreateConfiguration<T>();
             return new ModelConfigurationBuilder<T>(configuration);
         }
 
         public static ModelConfigurationBuilder<T> Model<T>(Enum group)
         {
-            var configuration = ValidationModels.Configuration<T>(group);
+            var configuration = ValidationModels.GetOrCreateConfiguration<T>(group);
             return new ModelConfigurationBuilder<T>(configuration);
         }
 
         public static void Model<T>(Action<ModelConfigurationBuilder<T>> buildAction)
         {
-            var configuration = ValidationModels.Configuration<T>();
+            var configuration = ValidationModels.GetOrCreateConfiguration<T>();
             buildAction?.Invoke(new ModelConfigurationBuilder<T>(configuration));
         }
 
         public static void Model<T>(Enum group, Action<ModelConfigurationBuilder<T>> buildAction)
         {
-            var configuration = ValidationModels.Configuration<T>(group);
+            var configuration = ValidationModels.GetOrCreateConfiguration<T>(group);
             buildAction?.Invoke(new ModelConfigurationBuilder<T>(configuration));
         }
 
@@ -53,9 +53,11 @@ namespace EasyValidation
 
         public static ValidationResult Validate<T>(T instance, Enum group, IPropertySelect selector)
         {
-            var context = new ValidationContext(instance);
+            var context = new ValidationContext(instance, group);
             var result = new ValidationResult();
-            var configuration = ValidationModels.Configuration(context.InstanceType, group);
+            var configuration = ValidationModels.GetConfiguration(context.InstanceType, context.Group);
+            if (configuration == null)
+                return result;
 
             var validators = configuration.Validators;
             if (selector != null)

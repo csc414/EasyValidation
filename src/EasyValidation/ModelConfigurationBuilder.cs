@@ -22,5 +22,11 @@ namespace EasyValidation
 
             return new PropertyValidatorBuilder<T, TProperty>(Configuration.GetValidator(propertyInfo));
         }
+
+        public void Inherited(Enum group = null)
+        {
+            Configuration.Inherited = true;
+            Configuration.InheritedGroup = group;
+        }
     }
 }

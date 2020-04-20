@@ -1,6 +1,7 @@
 ﻿using EasyValidation.Rules;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -91,7 +92,7 @@ namespace EasyValidation
                 {
                     if (predicate((T)instance))
                     {
-                        var failure = validator.Validate(context.Context);
+                        var failure = validator.Validate(context.ParentContext);
                         if (failure != null)
                         {
                             rule.ErrorMessage = failure.ErrorMessage;
@@ -175,6 +176,12 @@ namespace EasyValidation
             return builder;
         }
 
+        public static PropertyValidatorBuilder<T, string> IdentityCard<T>(this PropertyValidatorBuilder<T, string> builder, string message = null)
+        {
+            builder.Validator.Rules.Add(new IdentityCardValidationRule() { ErrorMessage = message });
+            return builder;
+        }
+
         public static PropertyValidatorBuilder<T, string> Length<T>(this PropertyValidatorBuilder<T, string> builder, int min, int max, string message = null)
         {
             builder.Validator.Rules.Add(new LengthValidationRule(min, max) { ErrorMessage = message });
@@ -208,6 +215,18 @@ namespace EasyValidation
         public static PropertyValidatorBuilder<T, TProperty?> Range<T, TProperty>(this PropertyValidatorBuilder<T, TProperty?> builder, TProperty from, TProperty to, string message = null) where TProperty : struct, IComparable<TProperty>, IComparable
         {
             builder.Validator.Rules.Add(new RangeValidationRule(from, to) { ErrorMessage = message });
+            return builder;
+        }
+
+        public static PropertyValidatorBuilder<T, TProperty> Validate<T, TProperty>(this PropertyValidatorBuilder<T, TProperty> builder, Enum group = null, string message = null) where TProperty : class
+        {
+            builder.Validator.Rules.Add(new ChildValidationRule(group) { ErrorMessage = message });
+            return builder;
+        }
+
+        public static PropertyValidatorBuilder<T, IEnumerable<TProperty>> Validate<T, TProperty>(this PropertyValidatorBuilder<T, IEnumerable<TProperty>> builder, Enum group = null, string message = null) where TProperty : class
+        {
+            builder.Validator.Rules.Add(new ChildValidationRule(group) { ErrorMessage = message });
             return builder;
         }
     }

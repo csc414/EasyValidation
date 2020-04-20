@@ -7,17 +7,17 @@ namespace EasyValidation
     {
         private static readonly Dictionary<Type, Dictionary<object, ModelConfiguration>> _configurations = new Dictionary<Type, Dictionary<object, ModelConfiguration>>();
 
-        public static ModelConfiguration Configuration<T>()
+        public static ModelConfiguration GetOrCreateConfiguration<T>()
         {
-            return Configuration(typeof(T), null);
+            return GetOrCreateConfiguration<T>(null);
         }
 
-        public static ModelConfiguration Configuration<T>(Enum group)
+        public static ModelConfiguration GetOrCreateConfiguration<T>(Enum group)
         {
-            return Configuration(typeof(T), group);
+            return GetOrCreateConfiguration(typeof(T), group);
         }
 
-        public static ModelConfiguration Configuration(Type modelType, Enum group)
+        public static ModelConfiguration GetOrCreateConfiguration(Type modelType, Enum group)
         {
             if (!_configurations.TryGetValue(modelType, out var groups))
                 _configurations.Add(modelType, groups = new Dictionary<object, ModelConfiguration>());
@@ -27,6 +27,21 @@ namespace EasyValidation
                 key = group;
             if (!groups.TryGetValue(key, out var configuration))
                 groups.Add(key, configuration = new ModelConfiguration(modelType));
+
+            return configuration;
+        }
+
+        public static ModelConfiguration GetConfiguration(Type modelType, Enum group)
+        {
+            if (!_configurations.TryGetValue(modelType, out var groups))
+                return null;
+
+            object key = modelType;
+            if (group != null)
+                key = group;
+
+            if (!groups.TryGetValue(key, out var configuration))
+                return null;
 
             return configuration;
         }

@@ -24,7 +24,7 @@ namespace EasyValidation.Rules
                 if (rule.IsValid(context))
                     return false;
             }
-            return false;
+            return true;
         }
     }
 }

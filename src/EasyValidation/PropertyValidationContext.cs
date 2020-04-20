@@ -16,24 +16,22 @@ namespace EasyValidation
 
         public PropertyValidationContext(ValidationContext context, PropertyValidator propertyValidator)
         {
-            Context = context;
+            ParentContext = context;
             Descriptor = propertyValidator.Descriptor;
             FormattedArguments = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { { nameof(PropertyName), propertyValidator.Descriptor.DisplayName ?? propertyValidator.Descriptor.PropertyInfo.Name } };
         }
 
-        public ValidationContext Context { get; }
+        public ValidationContext ParentContext { get; }
 
         public PropertyDescriptor Descriptor { get; }
 
-        public object Instance => Context.Instance;
-
-        public Type InstanceType => Context.InstanceType;
+        public object Instance => ParentContext.Instance;
 
         public PropertyInfo PropertyInfo => Descriptor.PropertyInfo;
 
         public string PropertyName => PropertyInfo.Name;
 
-        public object PropertyValue => _value ?? (_value = PropertyInfo.GetValue(Context.Instance));
+        public object PropertyValue => _value ?? (_value = PropertyInfo.GetValue(ParentContext.Instance));
 
         public string DisplayName => Descriptor.DisplayName;
 

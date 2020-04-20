@@ -15,7 +15,7 @@
 
         public override bool IsValid(PropertyValidationContext context)
         {
-            var failure = _validator.Validate(context.Context);
+            var failure = _validator.Validate(context.ParentContext);
             if (failure == null)
                 return true;
 
