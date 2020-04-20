@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>小川</Authors>
+    <Company>小川工作室</Company>
   </PropertyGroup>
 
   <ItemGroup>
